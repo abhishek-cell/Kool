@@ -14,7 +14,7 @@ namespace KoolApplicationMain.Controllers
     {
         public IActionResult Index()
         {
-            return View("ProductDetail");
+            return View();
         }
         public IActionResult ProductDetail()
         {
