@@ -14,7 +14,32 @@ namespace KoolApplicationMain.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return View("ProductDetails");
+        }
+        public IActionResult ProductDetail()
+        {
+            Search search = new Search();
+            var model = new List<Product>();
+            using (MySqlConnection conn = search.GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand("select XXIBM_PRODUCT_SKU.Item_number,XXIBM_PRODUCT_SKU.description,XXIBM_PRODUCT_PRICING.List_price,XXIBM_PRODUCT_PRICING.In_stock from XXIBM_PRODUCT_SKU JOIN XXIBM_PRODUCT_PRICING ON XXIBM_PRODUCT_SKU.Item_number=XXIBM_PRODUCT_PRICING.Item_number AND XXIBM_PRODUCT_SKU.description ", conn);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        model.Add(new Product()
+                        {
+                            ItemNumber = Convert.ToInt32(reader["Item_number"]),
+                            Description = reader["description"].ToString(),
+                            Price = Convert.ToDouble(reader["List_price"]),
+                            Stock = reader["In_stock"].ToString()
+
+                        });
+                    }
+                }
+            }
+            return View(model);
         }
 
         public IActionResult About()
