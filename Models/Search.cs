@@ -15,7 +15,7 @@ namespace KoolApplicationMain.Models
 		public MySqlConnection GetConnection()
 		{
 			//database connection 
-			ConnectionString = @"server=mysql.database-check.svc.cluster.local; port=3306; database=productdb;uid=ccuser;pwd=welcome1";
+			ConnectionString = @"server=custom-mysql.gamification.svc.cluster.local; port=3306; database=sampledb;uid=xxuser;pwd=welcome1";
 			return new MySqlConnection(ConnectionString);
 		}
 
