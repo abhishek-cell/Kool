@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using KoolApplicationMain.Models;
 using MySql.Data.MySqlClient;
-
+using System.Data;
 
 namespace KoolApplicationMain.Controllers
 {
@@ -14,7 +14,35 @@ namespace KoolApplicationMain.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            Search search = new Search();
+            var model = new List<Product>();
+            DataTable dt = new DataTable();
+            MySqlDataAdapter mda;
+            using (MySqlConnection conn = search.GetConnection())
+            {
+                
+                conn.Open();
+                string str = "select XXIBM_PRODUCT_SKU.Item_number,XXIBM_PRODUCT_SKU.description,XXIBM_PRODUCT_PRICING.List_price,XXIBM_PRODUCT_PRICING.In_stock from XXIBM_PRODUCT_SKU JOIN XXIBM_PRODUCT_PRICING ON XXIBM_PRODUCT_SKU.Item_number=XXIBM_PRODUCT_PRICING.Item_number AND XXIBM_PRODUCT_SKU.description ";
+
+                //MySqlCommand cmd = new MySqlCommand(, conn);
+                mda = new MySqlDataAdapter(str, search.GetConnection());
+                mda.Fill(dt);
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    model.Add(new Product()
+                    {
+                        ItemNumber = Convert.ToInt32(dt.Rows[i]["Item_number"]),
+                        Description = dt.Rows[i]["description"].ToString(),
+                        Price = Convert.ToDouble(dt.Rows[i]["List_price"]),
+                        Stock = dt.Rows[i]["In_stock"].ToString()
+
+                    });
+                }
+                
+            }
+            return View(model);
+
+            //return View();
         }
         public IActionResult ProductDetail()
         {
@@ -23,7 +51,7 @@ namespace KoolApplicationMain.Controllers
             using (MySqlConnection conn = search.GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("select XXIBM_PRODUCT_SKU.Item_number,XXIBM_PRODUCT_SKU.description,XXIBM_PRODUCT_PRICING.List_price,XXIBM_PRODUCT_PRICING.In_stock from XXIBM_PRODUCT_SKU JOIN XXIBM_PRODUCT_PRICING ON XXIBM_PRODUCT_SKU.Item_number=XXIBM_PRODUCT_PRICING.Item_number ", conn);
+                MySqlCommand cmd = new MySqlCommand("select XXIBM_PRODUCT_SKU.Item_number,XXIBM_PRODUCT_SKU.description,XXIBM_PRODUCT_PRICING.List_price,XXIBM_PRODUCT_PRICING.In_stock from XXIBM_PRODUCT_SKU JOIN XXIBM_PRODUCT_PRICING ON XXIBM_PRODUCT_SKU.Item_number=XXIBM_PRODUCT_PRICING.Item_number AND XXIBM_PRODUCT_SKU.description ", conn);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
